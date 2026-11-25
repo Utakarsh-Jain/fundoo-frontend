@@ -7,7 +7,7 @@ import {
     toggleTrash
 } from "../services/noteService";
 /*
- * Component Name : DashboardPage
+ * Component Name : DashboardPagee
  * Description    : Displays notes and handles note creation and pinning.
  * Author         : Utakarsh Jain
  * Date           : 25/11/2026
