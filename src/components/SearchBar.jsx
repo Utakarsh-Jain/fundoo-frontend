@@ -7,18 +7,18 @@
 
 function SearchBar({ searchQuery, setSearchQuery }) {
 
-    // Updates the search query.
-    const handleSearch = (e) => {
-        setSearchQuery(e.target.value);
-    };
-
     return (
-        <input
-            type="text"
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={handleSearch}
-        />
+        <div style={{ position: "relative" }}>
+            <span className="search-icon">⌕</span>
+            <input
+                className="input"
+                type="text"
+                placeholder="Search your notes..."
+                aria-label="Search notes"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
+        </div>
     );
 }
 
