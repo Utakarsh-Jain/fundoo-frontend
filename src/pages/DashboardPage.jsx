@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SearchBar from "../components/SearchBar";
 import {
     getAllNotes,
     createNote,
@@ -24,7 +25,8 @@ function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
     const [message, setMessage] = useState("");
-
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filter, setFilter] = useState("all");
     // Fetches notes from the backend API.
     const fetchNotes = async () => {
         try {
@@ -116,12 +118,39 @@ function DashboardPage() {
     if (loading) {
         return <p>Loading notes...</p>;
     }
+    // Filters notes based on title and description.
 
+    // Filters notes based on search query and pin status.
+    const filteredNotes = notes.filter((note) => {
+        const query = searchQuery.toLowerCase();
+
+        const matchesSearch =
+            note.title.toLowerCase().includes(query) ||
+            (note.description || "").toLowerCase().includes(query);
+
+        const matchesFilter =
+            filter === "all" ||
+            (filter === "pinned" && note.pinned) ||
+            (filter === "unpinned" && !note.pinned);
+
+        return matchesSearch && matchesFilter;
+    });
     return (
         <div>
             <h1>Fundoo Notes</h1>
             <h2>My Notes</h2>
-
+            <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
+            <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                >
+                <option value="all">All Notes</option>
+                <option value="pinned">Pinned Notes</option>
+                <option value="unpinned">Unpinned Notes</option>
+            </select>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -146,10 +175,10 @@ function DashboardPage() {
 
             {message && <p>{message}</p>}
 
-            {notes.length === 0 ? (
+            {filteredNotes.length === 0 ? (
                 <p>No notes available.</p>
             ) : (
-                notes.map((note) => (
+                filteredNotes.map((note) => (
                     <div key={note.id}>
                         <h3>{note.title}</h3>
                         <p>{note.description}</p>
