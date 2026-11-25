@@ -1,5 +1,9 @@
-import { useEffect, useState } from "react";
-import SearchBar from "../components/SearchBar";
+import { useCallback, useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+
+import NoteCard from "../components/NoteCard";
+
+import { createReminder } from "../services/reminderService";
 import {
     getAllNotes,
     createNote,
@@ -7,41 +11,51 @@ import {
     toggleArchive,
     toggleTrash
 } from "../services/noteService";
+import {
+    assignLabelToNote,
+    removeLabelFromNote
+} from "../services/labelService";
+
 /*
- * Component Name : DashboardPagee
- * Description    : Displays notes and handles note creation and pinning.
+ * Component Name : DashboardPage
+ * Description    : Displays active notes with creation, filtering and label actions.
  * Author         : Utakarsh Jain
- * Date           : 25/11/2026
+ * Date           : 26/11/2026
  */
 
 function DashboardPage() {
 
-    const [notes, setNotes] = useState([]);
-    const [formData, setFormData] = useState({
-        title: "",
-        description: ""
-    });
+    const {
+        labels = [],
+        selectedLabel,
+        searchQuery,
+        notify
+    } = useOutletContext() || {};
 
+    const [notes, setNotes] = useState([]);
+    const [formData, setFormData] = useState({ title: "", description: "" });
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
-    const [message, setMessage] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState("all");
-    // Fetches notes from the backend API.
-    const fetchNotes = async () => {
-        try {
-            const response = await getAllNotes();
-            setNotes(response);
-        } catch (error) {
-            setMessage(
-                error.response?.data?.message || "Failed to fetch notes."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    // Updates note form fields.
+    const fetchNotes = useCallback(() => getAllNotes()
+        .then((response) => {
+            setNotes(Array.isArray(response) ? response : []);
+        })
+        .catch((error) => {
+            notify(
+                error.response?.data?.message || "Failed to fetch notes.",
+                "error"
+            );
+        })
+        .finally(() => {
+            setLoading(false);
+        }), [notify]);
+
+    useEffect(() => {
+        fetchNotes();
+    }, [fetchNotes]);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -49,159 +63,211 @@ function DashboardPage() {
         });
     };
 
-    // Creates a new note and refreshes the dashboard.
     const handleSubmit = async (e) => {
         e.preventDefault();
         setCreating(true);
-        setMessage("");
 
         try {
             await createNote(formData);
-
-            setFormData({
-                title: "",
-                description: ""
-            });
-
-            setMessage("Note created successfully!");
+            setFormData({ title: "", description: "" });
+            notify("Note created successfully!");
             await fetchNotes();
         } catch (error) {
-            setMessage(
-                error.response?.data?.message || "Failed to create note."
+            notify(
+                error.response?.data?.message || "Failed to create note.",
+                "error"
             );
         } finally {
             setCreating(false);
         }
     };
 
-    // Toggles pin status and refreshes the dashboard.
-    const handlePin = async (noteId) => {
+    const runAction = async (action, successMessage, errorMessage) => {
         try {
-            await togglePin(noteId);
-            setMessage("Note pin status updated successfully!");
+            await action();
+            notify(successMessage);
             await fetchNotes();
         } catch (error) {
-            setMessage(
-                error.response?.data?.message || "Failed to update pin status."
-            );
-        }
-    };
-    // Toggles archive status and refreshes the dashboard.
-    const handleArchive = async (noteId) => {
-        try {
-            await toggleArchive(noteId);
-            setMessage("Note archive status updated successfully!");
-            await fetchNotes();
-        } catch (error) {
-            setMessage(
-                error.response?.data?.message || "Failed to update archive status."
-            );
-        }
-    };
-    // Toggles trash status and refreshes the dashboard.
-    const handleTrash = async (noteId) => {
-        try {
-            await toggleTrash(noteId);
-            setMessage("Note trash status updated successfully!");
-            await fetchNotes();
-        } catch (error) {
-            setMessage(
-                error.response?.data?.message || "Failed to update trash status."
+            notify(
+                error.response?.data?.message || errorMessage,
+                "error"
             );
         }
     };
 
-    useEffect(() => {
-        fetchNotes();
-    }, []);
+    const handlePin = (noteId) => runAction(
+        () => togglePin(noteId),
+        "Pin status updated.",
+        "Failed to update pin status."
+    );
+
+    const handleArchive = (noteId) => runAction(
+        () => toggleArchive(noteId),
+        "Note archived.",
+        "Failed to archive note."
+    );
+
+    const handleTrash = (noteId) => runAction(
+        () => toggleTrash(noteId),
+        "Note moved to trash.",
+        "Failed to move note to trash."
+    );
+
+    const handleSetReminder = (noteId, reminderTime) => runAction(
+        () => createReminder({ noteId, reminderTime }),
+        "Reminder scheduled successfully!",
+        "Failed to schedule reminder."
+    );
+
+    const handleAssignLabel = (labelId, noteId) => runAction(
+        () => assignLabelToNote(labelId, noteId),
+        "Label assigned successfully!",
+        "Failed to assign label."
+    );
+
+    const handleRemoveLabel = (labelId, noteId) => runAction(
+        () => removeLabelFromNote(labelId, noteId),
+        "Label removed successfully!",
+        "Failed to remove label."
+    );
+
+    const filteredNotes = notes
+        .filter((note) => !note.archived && !note.trashed)
+        .filter((note) => {
+            const query = (searchQuery || "").toLowerCase();
+
+            const matchesSearch =
+                (note.title || "").toLowerCase().includes(query) ||
+                (note.description || "").toLowerCase().includes(query);
+
+            const matchesFilter =
+                filter === "all" ||
+                (filter === "pinned" && note.pinned) ||
+                (filter === "unpinned" && !note.pinned);
+
+            const matchesLabel =
+                selectedLabel === null ||
+                (note.labels || []).some(
+                    (label) => label.id === selectedLabel
+                );
+
+            return matchesSearch && matchesFilter && matchesLabel;
+        })
+        .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+
+    const selectedLabelName = labels.find(
+        (label) => label.id === selectedLabel
+    )?.name;
 
     if (loading) {
-        return <p>Loading notes...</p>;
+        return (
+            <main className="page-content">
+                <div className="loading-state">
+                    <div>
+                        <div className="spinner" />
+                        <p>Loading your notes...</p>
+                    </div>
+                </div>
+            </main>
+        );
     }
-    // Filters notes based on title and description.
 
-    // Filters notes based on search query and pin status.
-    const filteredNotes = notes.filter((note) => {
-        const query = searchQuery.toLowerCase();
-
-        const matchesSearch =
-            note.title.toLowerCase().includes(query) ||
-            (note.description || "").toLowerCase().includes(query);
-
-        const matchesFilter =
-            filter === "all" ||
-            (filter === "pinned" && note.pinned) ||
-            (filter === "unpinned" && !note.pinned);
-
-        return matchesSearch && matchesFilter;
-    });
     return (
-        <div>
-            <h1>Fundoo Notes</h1>
-            <h2>My Notes</h2>
-            <SearchBar
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-            />
-            <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                >
-                <option value="all">All Notes</option>
-                <option value="pinned">Pinned Notes</option>
-                <option value="unpinned">Unpinned Notes</option>
-            </select>
-            <form onSubmit={handleSubmit}>
+        <main className="page-content">
+            <div className="page-head">
+                <div>
+                    <h1>{selectedLabelName || "My Notes"}</h1>
+                    <p>Capture your thoughts, keep them organised.</p>
+                </div>
+                <span className="count-pill">
+                    {filteredNotes.length} {filteredNotes.length === 1 ? "note" : "notes"}
+                </span>
+            </div>
+
+            <form className="composer" onSubmit={handleSubmit}>
                 <input
+                    className="input"
                     type="text"
                     name="title"
-                    placeholder="Note Title"
+                    placeholder="Title"
                     value={formData.title}
                     onChange={handleChange}
+                    aria-label="Note title"
                     required
                 />
-
                 <textarea
+                    className="input"
                     name="description"
-                    placeholder="Note Description"
+                    placeholder="Write something..."
                     value={formData.description}
                     onChange={handleChange}
+                    aria-label="Note description"
                 />
-
-                <button type="submit" disabled={creating}>
-                    {creating ? "Creating..." : "Create Note"}
-                </button>
+                <div className="composer-footer">
+                    <span>Notes are saved to your account</span>
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={creating}
+                    >
+                        {creating ? "Creating..." : "Create Note"}
+                    </button>
+                </div>
             </form>
 
-            {message && <p>{message}</p>}
+            <div className="toolbar">
+                <div className="filter-tabs">
+                    {[
+                        ["all", "All"],
+                        ["pinned", "Pinned"],
+                        ["unpinned", "Others"]
+                    ].map(([value, label]) => (
+                        <button
+                            key={value}
+                            type="button"
+                            className={`filter-tab ${filter === value ? "active" : ""}`}
+                            onClick={() => setFilter(value)}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+                <span className="toolbar-hint">
+                    {selectedLabelName
+                        ? `Showing notes labeled “${selectedLabelName}”`
+                        : "Tip: use the sidebar to organise notes with labels"}
+                </span>
+            </div>
 
             {filteredNotes.length === 0 ? (
-                <p>No notes available.</p>
+                <div className="empty-state">
+                    <div className="empty-icon">✎</div>
+                    <h3>Nothing here yet</h3>
+                    <p>
+                        {searchQuery
+                            ? "Try a different search term."
+                            : "Create a note above to get started."}
+                    </p>
+                </div>
             ) : (
-                filteredNotes.map((note) => (
-                    <div key={note.id}>
-                        <h3>{note.title}</h3>
-                        <p>{note.description}</p>
-
-                        <p>
-                            {note.pinned && "Pinned"}
-                            {note.archived && " | Archived"}
-                            {note.trashed && " | Trashed"}
-                        </p>
-
-                        <button onClick={() => handlePin(note.id)}>
-                            {note.pinned ? "Unpin" : "Pin"}
-                        </button>
-                        <button onClick={() => handleArchive(note.id)}>
-                            {note.archived ? "Unarchive" : "Archive"}
-                        </button>
-                        <button onClick={() => handleTrash(note.id)}>
-                            {note.trashed ? "Restore" : "Trash"}
-                        </button>
-                    </div>
-                ))
+                <div className="notes-grid">
+                    {filteredNotes.map((note) => (
+                        <NoteCard
+                            key={note.id}
+                            note={note}
+                            labels={labels}
+                            onPin={handlePin}
+                            onArchive={handleArchive}
+                            onTrash={handleTrash}
+                            onSetReminder={handleSetReminder}
+                            onAssignLabel={handleAssignLabel}
+                            onRemoveLabel={handleRemoveLabel}
+                            onNotify={notify}
+                        />
+                    ))}
+                </div>
             )}
-        </div>
+        </main>
     );
 }
 
