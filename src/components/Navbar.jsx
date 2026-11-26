@@ -19,7 +19,7 @@ function Navbar({
     labels = [],
     selectedLabel,
     onSelectLabel,
-    onCreateLabel,
+    onSaveLabel,
     onDeleteLabel,
     onLogout,
     open,
@@ -30,19 +30,68 @@ function Navbar({
     const location = useLocation();
 
     const [showLabelInput, setShowLabelInput] = useState(false);
+    const [editingLabelId, setEditingLabelId] = useState(null);
     const [labelName, setLabelName] = useState("");
+    const [error, setError] = useState("");
 
-    const handleCreateLabel = async (e) => {
-        e.preventDefault();
+    const closeForm = () => {
+        setShowLabelInput(false);
+        setEditingLabelId(null);
+        setLabelName("");
+        setError("");
+    };
 
-        if (!labelName.trim()) {
+    const openCreateForm = () => {
+        if (showLabelInput && editingLabelId === null) {
+            closeForm();
             return;
         }
 
-        await onCreateLabel(labelName.trim());
-
+        setEditingLabelId(null);
         setLabelName("");
-        setShowLabelInput(false);
+        setError("");
+        setShowLabelInput(true);
+    };
+
+    const openEditForm = (label) => {
+        setEditingLabelId(label.id);
+        setLabelName(label.name);
+        setError("");
+        setShowLabelInput(true);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const name = labelName.trim();
+
+        if (!name) {
+            setError("Label name is required.");
+            return;
+        }
+
+        if (name.length > 50) {
+            setError("Label name cannot exceed 50 characters.");
+            return;
+        }
+
+        const duplicate = labels.some((label) =>
+            label.id !== editingLabelId &&
+            label.name.trim().toLowerCase() === name.toLowerCase()
+        );
+
+        if (duplicate) {
+            setError("You already have a label with this name.");
+            return;
+        }
+
+        const result = await onSaveLabel(name, editingLabelId);
+
+        if (result?.success) {
+            closeForm();
+        } else {
+            setError(result?.message || "Failed to save label.");
+        }
     };
 
     const handleNavigation = (path) => {
@@ -92,38 +141,48 @@ function Navbar({
                     className="icon-button"
                     title="Create a new label"
                     aria-label="Create a new label"
-                    onClick={() => setShowLabelInput(!showLabelInput)}
+                    onClick={openCreateForm}
                 >
                     {showLabelInput ? "−" : "+"}
                 </button>
             </div>
 
             {showLabelInput && (
-                <form className="label-form" onSubmit={handleCreateLabel}>
+                <form className="label-form" onSubmit={handleSubmit}>
+                    <p className="label-form-heading">
+                        {editingLabelId === null ? "New label" : "Rename label"}
+                    </p>
+
                     <input
                         className="input"
                         type="text"
                         placeholder="Label name"
                         value={labelName}
-                        onChange={(e) => setLabelName(e.target.value)}
+                        onChange={(e) => {
+                            setLabelName(e.target.value);
+                            setError("");
+                        }}
                         maxLength={50}
                         required
                         autoFocus
                     />
 
+                    {error && (
+                        <p className="label-error" role="alert">
+                            {error}
+                        </p>
+                    )}
+
                     <div className="label-form-actions">
                         <button
                             type="button"
                             className="btn btn-link"
-                            onClick={() => {
-                                setShowLabelInput(false);
-                                setLabelName("");
-                            }}
+                            onClick={closeForm}
                         >
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary">
-                            Save
+                            {editingLabelId === null ? "Save" : "Update"}
                         </button>
                     </div>
                 </form>
@@ -146,15 +205,27 @@ function Navbar({
                                 <span>{label.name}</span>
                             </button>
 
-                            <button
-                                type="button"
-                                className="icon-button label-delete"
-                                title="Delete label"
-                                aria-label={`Delete ${label.name}`}
-                                onClick={() => onDeleteLabel(label.id)}
-                            >
-                                ×
-                            </button>
+                            <div className="label-actions">
+                                <button
+                                    type="button"
+                                    className="icon-button label-edit"
+                                    title="Rename label"
+                                    aria-label={`Rename ${label.name}`}
+                                    onClick={() => openEditForm(label)}
+                                >
+                                    ✎
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="icon-button label-delete"
+                                    title="Delete label"
+                                    aria-label={`Delete ${label.name}`}
+                                    onClick={() => onDeleteLabel(label.id)}
+                                >
+                                    ×
+                                </button>
+                            </div>
                         </div>
                     ))
                 )}

@@ -12,6 +12,14 @@ export const createLabel = async (labelData) => {
     return response.data;
 };
 
+export const updateLabel = async (labelId, labelData) => {
+    const response = await apiClient.put(
+        `/api/labels/${labelId}`,
+        labelData
+    );
+    return response.data;
+};
+
 export const getAllLabels = async () => {
     const response = await apiClient.get("/api/labels");
     return response.data;

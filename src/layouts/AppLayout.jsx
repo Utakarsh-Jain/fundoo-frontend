@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import SearchBar from "../components/SearchBar";
 import {
     createLabel,
+    updateLabel,
     getAllLabels,
     deleteLabel
 } from "../services/labelService";
@@ -42,16 +43,31 @@ function AppLayout() {
             );
         }), [notify]);
 
-    const handleCreateLabel = async (name) => {
+    const handleSaveLabel = async (name, labelId = null) => {
+        const isUpdate = labelId !== null;
+
         try {
-            await createLabel({ name });
-            notify("Label created successfully!");
-            await fetchLabels();
-        } catch (error) {
+            if (isUpdate) {
+                await updateLabel(labelId, { name });
+            } else {
+                await createLabel({ name });
+            }
+
             notify(
-                error.response?.data?.message || "Failed to create label.",
-                "error"
+                isUpdate
+                    ? "Label updated successfully!"
+                    : "Label created successfully!"
             );
+            await fetchLabels();
+
+            return { success: true };
+        } catch (error) {
+            const message = error.response?.data?.message
+                || `Failed to ${isUpdate ? "update" : "create"} label.`;
+
+            notify(message, "error");
+
+            return { success: false, message };
         }
     };
 
@@ -104,7 +120,7 @@ function AppLayout() {
                 labels={labels}
                 selectedLabel={selectedLabel}
                 onSelectLabel={setSelectedLabel}
-                onCreateLabel={handleCreateLabel}
+                onSaveLabel={handleSaveLabel}
                 onDeleteLabel={handleDeleteLabel}
                 onLogout={handleLogout}
                 open={sidebarOpen}
