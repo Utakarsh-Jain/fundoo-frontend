@@ -920,6 +920,61 @@ p {
   font-size: 12px;
 }
 
+.reminder-section {
+  margin-bottom: 32px;
+}
+
+.reminder-section > h2 {
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+
+.reminder-list {
+  display: grid;
+  gap: 12px;
+}
+
+.reminder-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.reminder-item-main h3 {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.reminder-item-main p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.reminder-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.reminder-edit {
+  flex-basis: 100%;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.reminder-edit .input {
+  max-width: 260px;
+}
+
+.reminder-edit .label-error {
+  margin-top: 8px;
+}
+
 .info-banner {
   display: flex;
   align-items: center;
