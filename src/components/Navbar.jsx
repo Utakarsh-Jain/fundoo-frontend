@@ -12,7 +12,8 @@ const NAV_ITEMS = [
     { path: "/dashboard", label: "Notes", icon: "📝" },
     { path: "/reminders", label: "Reminders", icon: "⏰" },
     { path: "/archive", label: "Archive", icon: "📦" },
-    { path: "/trash", label: "Trash", icon: "🗑️" }
+    { path: "/trash", label: "Trash", icon: "🗑️" },
+    { path: "/attachments", label: "Attachments", icon: "⇪" }
 ];
 
 function Navbar({

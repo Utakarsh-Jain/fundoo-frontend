@@ -1202,3 +1202,104 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+.attachment-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.attachment-panel h2 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.attachment-hint,
+.attachment-selection {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.attachment-selection {
+  margin: 12px 0 0;
+  font-weight: 550;
+}
+
+.upload-form {
+  margin-top: 16px;
+}
+
+.upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.upload-row .input {
+  flex: 1 1 280px;
+  padding: 10px;
+}
+
+.attachment-error {
+  margin-top: 12px;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.attachment-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.attachment-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.attachment-name {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.attachment-meta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.attachment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attachment-empty {
+  text-align: center;
+  padding: 36px 16px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.attachment-empty h3 {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.attachment-empty p {
+  color: var(--muted);
+  font-size: 13px;
+}
