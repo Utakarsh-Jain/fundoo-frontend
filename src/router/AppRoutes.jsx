@@ -9,6 +9,7 @@ import DashboardPage from "../pages/DashboardPage";
 import ReminderPage from "../pages/ReminderPage";
 import ArchivePage from "../pages/ArchivePage";
 import TrashPage from "../pages/TrashPage";
+import AttachmentPage from "../pages/AttachmentPage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import AppLayout from "../layouts/AppLayout";
@@ -41,6 +42,7 @@ function AppRoutes() {
                     <Route path="/reminders" element={<ReminderPage />} />
                     <Route path="/archive" element={<ArchivePage />} />
                     <Route path="/trash" element={<TrashPage />} />
+                    <Route path="/attachments" element={<AttachmentPage />} />
                 </Route>
             </Route>
 
