@@ -9,6 +9,7 @@ import {
     getAllLabels,
     deleteLabel
 } from "../services/labelService";
+import { logoutUser } from "../services/authService";
 import { removeToken } from "../utils/token";
 
 /*
@@ -89,7 +90,8 @@ function AppLayout() {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        await logoutUser().catch(() => null);
         removeToken();
         navigate("/login", { replace: true });
     };

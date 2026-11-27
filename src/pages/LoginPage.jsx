@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authService";
+import { useLocation, useNavigate } from "react-router-dom";
+import { loginUser, resendVerificationEmail } from "../services/authService";
 import { setToken } from "../utils/token";
 
 /*
@@ -12,10 +12,14 @@ import { setToken } from "../utils/token";
 
 function LoginPage() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [formData, setFormData] = useState({ email: "", password: "" });
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(
+        location.state?.message || ""
+    );
     const [loading, setLoading] = useState(false);
+    const [resending, setResending] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -40,6 +44,31 @@ function LoginPage() {
             );
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleResendVerification = async () => {
+        if (!formData.email) {
+            setMessage("Enter your email address first.");
+            return;
+        }
+
+        setResending(true);
+        setMessage("");
+
+        try {
+            const response = await resendVerificationEmail(formData.email);
+            setMessage(
+                response.message ||
+                "If the account exists, a verification email has been sent."
+            );
+        } catch (error) {
+            setMessage(
+                error.response?.data?.message ||
+                "Unable to resend the verification email."
+            );
+        } finally {
+            setResending(false);
         }
     };
 
@@ -112,9 +141,36 @@ function LoginPage() {
                         >
                             {loading ? "Logging in..." : "Login"}
                         </button>
+
+                        <div className="auth-form-links">
+                            <button
+                                type="button"
+                                className="btn-link"
+                                onClick={() => navigate("/forgot-password", {
+                                    state: { email: formData.email }
+                                })}
+                            >
+                                Forgot password?
+                            </button>
+                        </div>
                     </form>
 
                     {message && <div className="alert">{message}</div>}
+
+                    {/verif/i.test(message) && (
+                        <div className="auth-form-links">
+                            <button
+                                type="button"
+                                className="btn-link"
+                                onClick={handleResendVerification}
+                                disabled={resending}
+                            >
+                                {resending
+                                    ? "Sending..."
+                                    : "Resend verification email"}
+                            </button>
+                        </div>
+                    )}
 
                     <p className="auth-switch">
                         Don&apos;t have an account?{" "}

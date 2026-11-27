@@ -35,7 +35,13 @@ function RegisterPage() {
 
         try {
             await registerUser(formData);
-            navigate("/login", { replace: true });
+            navigate("/login", {
+                replace: true,
+                state: {
+                    message:
+                        "Account created. Check your email to verify your account."
+                }
+            });
         } catch (error) {
             setMessage(
                 error.response?.data?.message ||
