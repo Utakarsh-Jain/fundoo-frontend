@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { istNowInputValue } from "../utils/reminderTime";
+
 /*
  * Component Name : NoteCard
  * Description    : Displays note details and manages note operations and labels.
@@ -24,17 +26,14 @@ function NoteCard({
     const [showReminder, setShowReminder] = useState(false);
 
     const assignedLabels = note.labels || [];
-    const now = new Date();
-    const localMin = new Date(
-        now.getTime() - now.getTimezoneOffset() * 60000
-    ).toISOString().slice(0, 16);
+    const istMin = istNowInputValue();
 
     const handleReminder = () => {
         if (!reminderTime) {
             return;
         }
 
-        if (new Date(reminderTime) <= new Date()) {
+        if (reminderTime <= istNowInputValue()) {
             onNotify("Please select a future date and time.", "error");
             return;
         }
@@ -125,7 +124,7 @@ function NoteCard({
                             className="input"
                             type="datetime-local"
                             value={reminderTime}
-                            min={localMin}
+                            min={istMin}
                             onChange={(e) => setReminderTime(e.target.value)}
                             aria-label="Reminder date and time"
                         />

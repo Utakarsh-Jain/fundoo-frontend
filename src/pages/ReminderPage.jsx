@@ -8,6 +8,11 @@ import {
     updateReminder
 } from "../services/reminderService";
 import { getAllNotes } from "../services/noteService";
+import {
+    formatReminderTime,
+    istNowInputValue,
+    toIstInputValue
+} from "../utils/reminderTime";
 
 /*
  * Component Name : ReminderPage
@@ -15,29 +20,6 @@ import { getAllNotes } from "../services/noteService";
  * Author         : Utakarsh Jain
  * Date           : 26/11/2026
  */
-
-function toLocalInputValue(value) {
-    if (!value) {
-        return "";
-    }
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-        return "";
-    }
-
-    const local = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-    );
-    return local.toISOString().slice(0, 16);
-}
-
-function formatReminderTime(value) {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-        ? String(value)
-        : date.toLocaleString();
-}
 
 const noop = () => {};
 
@@ -82,10 +64,15 @@ function ReminderPage() {
             .finally(() => setLoading(false));
     }, [fetchNotes, fetchReminders]);
 
-    const now = new Date();
-    const localMin = new Date(
-        now.getTime() - now.getTimezoneOffset() * 60000
-    ).toISOString().slice(0, 16);
+    useEffect(() => {
+        const timer = setInterval(() => {
+            fetchReminders();
+        }, 30000);
+
+        return () => clearInterval(timer);
+    }, [fetchReminders]);
+
+    const istMin = istNowInputValue();
 
     const query = (searchQuery || "").toLowerCase();
 
@@ -109,7 +96,7 @@ function ReminderPage() {
             return;
         }
 
-        if (new Date(reminderTime) <= new Date()) {
+        if (reminderTime <= istNowInputValue()) {
             notify("Please select a future date and time.", "error");
             return;
         }
@@ -134,7 +121,7 @@ function ReminderPage() {
 
     const openEditForm = (reminder) => {
         setEditingReminderId(reminder.id);
-        setEditTime(toLocalInputValue(reminder.reminderTime));
+        setEditTime(toIstInputValue(reminder.reminderTime));
         setError("");
     };
 
@@ -150,7 +137,7 @@ function ReminderPage() {
             return;
         }
 
-        if (new Date(editTime) <= new Date()) {
+        if (editTime <= istNowInputValue()) {
             setError("Please select a future date and time.");
             return;
         }
@@ -225,6 +212,8 @@ function ReminderPage() {
             <div className="info-banner">
                 <span>⏰</span>
                 Reminders are delivered to your registered email address.
+                All times are shown in IST (Asia/Kolkata). Completed reminders
+                are cleared automatically.
             </div>
 
             <section className="reminder-section">
@@ -277,7 +266,7 @@ function ReminderPage() {
                                         <input
                                             className="input"
                                             type="datetime-local"
-                                            min={localMin}
+                                            min={istMin}
                                             value={editTime}
                                             onChange={(e) => {
                                                 setEditTime(e.target.value);
@@ -340,7 +329,7 @@ function ReminderPage() {
                                         <input
                                             className="input"
                                             type="datetime-local"
-                                            min={localMin}
+                                            min={istMin}
                                             value={times[note.id] || ""}
                                             onChange={(e) => setTimes({
                                                 ...times,
