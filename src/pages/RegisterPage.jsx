@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import AuthHero from "../components/ui/AuthHero";
 import { registerUser } from "../services/authService";
 
 /*
@@ -54,29 +56,15 @@ function RegisterPage() {
 
     return (
         <div className="auth-shell">
-            <section className="auth-hero">
-                <div className="auth-logo">
-                    <span className="auth-logo-mark">✦</span>
-                    Fundoo Notes
-                </div>
-
-                <div className="auth-hero-copy">
-                    <h1>Start with a blank page. End with clarity.</h1>
-                    <p>
-                        Create your free account and keep every thought, task
-                        and reminder in one tidy place.
-                    </p>
-                    <div className="auth-hero-tags">
-                        <span>✎ Quick notes</span>
-                        <span>🏷️ Smart labels</span>
-                        <span>⏰ Reminders</span>
-                    </div>
-                </div>
-
-                <div className="auth-hero-footer">
-                    Simple, focused and made for your everyday thoughts.
-                </div>
-            </section>
+            <AuthHero
+                title="Start with a blank page. End with clarity."
+                description="Create your free account and keep every thought, task and reminder in one tidy place."
+                tags={[
+                    { icon: "edit", label: "Quick notes" },
+                    { icon: "label", label: "Smart labels" },
+                    { icon: "reminder", label: "Reminders" }
+                ]}
+            />
 
             <section className="auth-pane">
                 <div className="auth-card">

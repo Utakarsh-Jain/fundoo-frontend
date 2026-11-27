@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import NoteCard from "../components/NoteCard";
+import EmptyState from "../components/ui/EmptyState";
+import LoadingState from "../components/ui/LoadingState";
+import PageHeader from "../components/ui/PageHeader";
 
 import { createReminder } from "../services/reminderService";
 import {
@@ -70,35 +73,26 @@ function ArchivePage() {
     if (loading) {
         return (
             <main className="page-content">
-                <div className="loading-state">
-                    <div>
-                        <div className="spinner" />
-                        <p>Loading archived notes...</p>
-                    </div>
-                </div>
+                <LoadingState label="Loading archived notes..." />
             </main>
         );
     }
 
     return (
         <main className="page-content">
-            <div className="page-head">
-                <div>
-                    <h1>Archive</h1>
-                    <p>Notes you want to keep, but out of the way.</p>
-                </div>
-                <span className="count-pill">
-                    {archivedNotes.length}{" "}
-                    {archivedNotes.length === 1 ? "note" : "notes"}
-                </span>
-            </div>
+            <PageHeader
+                title="Archive"
+                description="Notes you want to keep, but out of the way."
+                count={archivedNotes.length}
+                countLabel={archivedNotes.length === 1 ? "note" : "notes"}
+            />
 
             {archivedNotes.length === 0 ? (
-                <div className="empty-state">
-                    <div className="empty-icon">📦</div>
-                    <h3>Your archive is empty</h3>
-                    <p>Archived notes will show up here.</p>
-                </div>
+                <EmptyState
+                    icon="archive"
+                    title="Your archive is empty"
+                    description="Archived notes will show up here."
+                />
             ) : (
                 <div className="notes-grid">
                     {archivedNotes.map((note) => (

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import AuthHero from "../components/ui/AuthHero";
 import { loginUser, resendVerificationEmail } from "../services/authService";
 import { setToken } from "../utils/token";
 
@@ -74,29 +75,15 @@ function LoginPage() {
 
     return (
         <div className="auth-shell">
-            <section className="auth-hero">
-                <div className="auth-logo">
-                    <span className="auth-logo-mark">✦</span>
-                    Fundoo Notes
-                </div>
-
-                <div className="auth-hero-copy">
-                    <h1>Your ideas, beautifully organised.</h1>
-                    <p>
-                        A calm home for every note, label and reminder — always
-                        in sync with your account.
-                    </p>
-                    <div className="auth-hero-tags">
-                        <span>✎ Quick notes</span>
-                        <span>🏷️ Smart labels</span>
-                        <span>⏰ Reminders</span>
-                    </div>
-                </div>
-
-                <div className="auth-hero-footer">
-                    Simple, focused and made for your everyday thoughts.
-                </div>
-            </section>
+            <AuthHero
+                title="Your ideas, beautifully organised."
+                description="A calm home for every note, label and reminder — always in sync with your account."
+                tags={[
+                    { icon: "edit", label: "Quick notes" },
+                    { icon: "label", label: "Smart labels" },
+                    { icon: "reminder", label: "Reminders" }
+                ]}
+            />
 
             <section className="auth-pane">
                 <div className="auth-card">

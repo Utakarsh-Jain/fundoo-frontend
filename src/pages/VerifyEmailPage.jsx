@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
+import AuthHero from "../components/ui/AuthHero";
 import { verifyEmail } from "../services/authService";
 
 function VerifyEmailPage() {
@@ -38,29 +40,15 @@ function VerifyEmailPage() {
 
     return (
         <div className="auth-shell">
-            <section className="auth-hero">
-                <div className="auth-logo">
-                    <span className="auth-logo-mark">✦</span>
-                    Fundoo Notes
-                </div>
-
-                <div className="auth-hero-copy">
-                    <h1>One small step to secure notes.</h1>
-                    <p>
-                        Email verification keeps your account protected and
-                        your reminders tied to the right inbox.
-                    </p>
-                    <div className="auth-hero-tags">
-                        <span>✉️ Verified email</span>
-                        <span>🔐 Safer access</span>
-                        <span>✦ Ready to note</span>
-                    </div>
-                </div>
-
-                <div className="auth-hero-footer">
-                    Simple, focused and made for your everyday thoughts.
-                </div>
-            </section>
+            <AuthHero
+                title="One small step to secure notes."
+                description="Email verification keeps your account protected and your reminders tied to the right inbox."
+                tags={[
+                    { icon: "mail", label: "Verified email" },
+                    { icon: "lock", label: "Safer access" },
+                    { icon: "check", label: "Ready to note" }
+                ]}
+            />
 
             <section className="auth-pane">
                 <div className="auth-card">

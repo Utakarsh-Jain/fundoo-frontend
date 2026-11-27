@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import NoteCard from "../components/NoteCard";
+import EmptyState from "../components/ui/EmptyState";
+import LoadingState from "../components/ui/LoadingState";
+import PageHeader from "../components/ui/PageHeader";
 
 import { createReminder } from "../services/reminderService";
 import {
@@ -169,27 +172,19 @@ function DashboardPage() {
     if (loading) {
         return (
             <main className="page-content">
-                <div className="loading-state">
-                    <div>
-                        <div className="spinner" />
-                        <p>Loading your notes...</p>
-                    </div>
-                </div>
+                <LoadingState label="Loading your notes..." />
             </main>
         );
     }
 
     return (
         <main className="page-content">
-            <div className="page-head">
-                <div>
-                    <h1>{selectedLabelName || "My Notes"}</h1>
-                    <p>Capture your thoughts, keep them organised.</p>
-                </div>
-                <span className="count-pill">
-                    {filteredNotes.length} {filteredNotes.length === 1 ? "note" : "notes"}
-                </span>
-            </div>
+            <PageHeader
+                title={selectedLabelName || "My Notes"}
+                description="Capture your thoughts, keep them organised."
+                count={filteredNotes.length}
+                countLabel={filteredNotes.length === 1 ? "note" : "notes"}
+            />
 
             <form className="composer" onSubmit={handleSubmit}>
                 <input
@@ -247,15 +242,13 @@ function DashboardPage() {
             </div>
 
             {filteredNotes.length === 0 ? (
-                <div className="empty-state">
-                    <div className="empty-icon">✎</div>
-                    <h3>Nothing here yet</h3>
-                    <p>
-                        {searchQuery
-                            ? "Try a different search term."
-                            : "Create a note above to get started."}
-                    </p>
-                </div>
+                <EmptyState
+                    icon="edit"
+                    title="Nothing here yet"
+                    description={searchQuery
+                        ? "Try a different search term."
+                        : "Create a note above to get started."}
+                />
             ) : (
                 <div className="notes-grid">
                     {filteredNotes.map((note) => (

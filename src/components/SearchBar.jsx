@@ -1,3 +1,5 @@
+import Icon from "./ui/Icon";
+
 /*
  * Component Name : SearchBar
  * Description    : Provides a search input for filtering notes.
@@ -8,8 +10,10 @@
 function SearchBar({ searchQuery, setSearchQuery }) {
 
     return (
-        <div style={{ position: "relative" }}>
-            <span className="search-icon">⌕</span>
+        <div className="search-field">
+            <span className="search-icon">
+                <Icon name="search" size={18} />
+            </span>
             <input
                 className="input"
                 type="text"
