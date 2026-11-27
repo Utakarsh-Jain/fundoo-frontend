@@ -292,6 +292,12 @@ p {
   font-size: 14px;
 }
 
+.auth-form-links {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
 .alert {
   margin-top: 16px;
   padding: 12px 14px;
