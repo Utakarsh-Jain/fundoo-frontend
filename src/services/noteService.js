@@ -48,3 +48,26 @@ export const toggleTrash = async (noteId) => {
 
     return response.data;
 };
+
+export const updateNote = async (noteId, noteData) => {
+    const response = await apiClient.put(
+        `/api/notes/${noteId}`,
+        noteData
+    );
+
+    return response.data;
+};
+
+export const restoreNote = async (noteId) => {
+    const response = await apiClient.patch(
+        `/api/notes/${noteId}/restore`
+    );
+
+    return response.data;
+};
+
+export const permanentlyDeleteNote = async (noteId) => {
+    const response = await apiClient.delete(`/api/notes/${noteId}`);
+
+    return response.data;
+};

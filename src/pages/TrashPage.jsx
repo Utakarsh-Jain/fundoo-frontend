@@ -3,17 +3,11 @@ import { useOutletContext } from "react-router-dom";
 
 import NoteCard from "../components/NoteCard";
 
-import { createReminder } from "../services/reminderService";
 import {
     getAllNotes,
-    togglePin,
-    toggleArchive,
-    toggleTrash
+    restoreNote,
+    permanentlyDeleteNote
 } from "../services/noteService";
-import {
-    assignLabelToNote,
-    removeLabelFromNote
-} from "../services/labelService";
 
 /*
  * Component Name : TrashPage
@@ -106,35 +100,15 @@ function TrashPage() {
                             key={note.id}
                             note={note}
                             labels={labels}
-                            onPin={(id) => runAction(
-                                () => togglePin(id),
-                                "Pin status updated.",
-                                "Failed to update pin status."
-                            )}
-                            onArchive={(id) => runAction(
-                                () => toggleArchive(id),
-                                "Note archive status updated.",
-                                "Failed to update archive status."
-                            )}
-                            onTrash={(id) => runAction(
-                                () => toggleTrash(id),
-                                "Note restored from trash.",
+                            onRestore={(id) => runAction(
+                                () => restoreNote(id),
+                                "Note restored successfully!",
                                 "Failed to restore note."
                             )}
-                            onSetReminder={(id, time) => runAction(
-                                () => createReminder({ noteId: id, reminderTime: time }),
-                                "Reminder scheduled successfully!",
-                                "Failed to schedule reminder."
-                            )}
-                            onAssignLabel={(labelId, id) => runAction(
-                                () => assignLabelToNote(labelId, id),
-                                "Label assigned successfully!",
-                                "Failed to assign label."
-                            )}
-                            onRemoveLabel={(labelId, id) => runAction(
-                                () => removeLabelFromNote(labelId, id),
-                                "Label removed successfully!",
-                                "Failed to remove label."
+                            onPermanentlyDelete={(id) => runAction(
+                                () => permanentlyDeleteNote(id),
+                                "Note permanently deleted.",
+                                "Failed to delete note permanently."
                             )}
                             onNotify={notify}
                         />

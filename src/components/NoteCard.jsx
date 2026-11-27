@@ -15,6 +15,9 @@ function NoteCard({
     onPin,
     onArchive,
     onTrash,
+    onUpdate,
+    onRestore,
+    onPermanentlyDelete,
     onSetReminder,
     onAssignLabel,
     onRemoveLabel,
@@ -24,6 +27,11 @@ function NoteCard({
     const [reminderTime, setReminderTime] = useState("");
     const [showLabels, setShowLabels] = useState(false);
     const [showReminder, setShowReminder] = useState(false);
+    const [showEdit, setShowEdit] = useState(false);
+    const [editForm, setEditForm] = useState({
+        title: note.title,
+        description: note.description || ""
+    });
 
     const assignedLabels = note.labels || [];
     const istMin = istNowInputValue();
@@ -55,6 +63,38 @@ function NoteCard({
         }
     };
 
+    const openEdit = () => {
+        setEditForm({
+            title: note.title,
+            description: note.description || ""
+        });
+        setShowEdit(true);
+    };
+
+    const handleEditChange = (e) => {
+        setEditForm({
+            ...editForm,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+
+        const title = editForm.title.trim();
+
+        if (!title) {
+            onNotify("Note title is required.", "error");
+            return;
+        }
+
+        await onUpdate(note.id, {
+            title,
+            description: editForm.description
+        });
+        setShowEdit(false);
+    };
+
     return (
         <article className={`note-card ${note.pinned ? "pinned" : ""}`}>
             <div className="note-card-top">
@@ -65,6 +105,39 @@ function NoteCard({
             </div>
 
             <p className="note-description">{note.description}</p>
+
+            {showEdit && (
+                <form className="note-edit-form" onSubmit={handleUpdate}>
+                    <input
+                        className="input"
+                        type="text"
+                        name="title"
+                        value={editForm.title}
+                        onChange={handleEditChange}
+                        aria-label={`Edit title for ${note.title}`}
+                        required
+                    />
+                    <textarea
+                        className="input"
+                        name="description"
+                        value={editForm.description}
+                        onChange={handleEditChange}
+                        aria-label={`Edit description for ${note.title}`}
+                    />
+                    <div className="note-edit-actions">
+                        <button
+                            type="button"
+                            className="btn btn-link"
+                            onClick={() => setShowEdit(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button type="submit" className="btn btn-primary">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            )}
 
             {assignedLabels.length > 0 && (
                 <div className="chip-row">
@@ -141,50 +214,83 @@ function NoteCard({
             )}
 
             <div className="note-actions">
-                <button
-                    type="button"
-                    className="action-btn"
-                    onClick={() => onPin(note.id)}
-                >
-                    <span className="emoji">📌</span>
-                    {note.pinned ? "Unpin" : "Pin"}
-                </button>
+                {note.trashed ? (
+                    <>
+                        <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => onRestore(note.id)}
+                        >
+                            <span className="emoji">↩️</span>
+                            Restore
+                        </button>
 
-                <button
-                    type="button"
-                    className="action-btn"
-                    onClick={() => onArchive(note.id)}
-                >
-                    <span className="emoji">📦</span>
-                    {note.archived ? "Unarchive" : "Archive"}
-                </button>
+                        <button
+                            type="button"
+                            className="action-btn danger"
+                            onClick={() => onPermanentlyDelete(note.id)}
+                        >
+                            <span className="emoji">✕</span>
+                            Delete forever
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            type="button"
+                            className="action-btn"
+                            onClick={openEdit}
+                        >
+                            <span className="emoji">✎</span>
+                            Edit
+                        </button>
 
-                <button
-                    type="button"
-                    className="action-btn danger"
-                    onClick={() => onTrash(note.id)}
-                >
-                    <span className="emoji">🗑️</span>
-                    {note.trashed ? "Restore" : "Trash"}
-                </button>
+                        <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => onPin(note.id)}
+                        >
+                            <span className="emoji">📌</span>
+                            {note.pinned ? "Unpin" : "Pin"}
+                        </button>
 
-                <button
-                    type="button"
-                    className="action-btn"
-                    onClick={() => setShowLabels(!showLabels)}
-                >
-                    <span className="emoji">🏷️</span>
-                    Labels
-                </button>
+                        <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => onArchive(note.id)}
+                        >
+                            <span className="emoji">📦</span>
+                            {note.archived ? "Unarchive" : "Archive"}
+                        </button>
 
-                <button
-                    type="button"
-                    className="action-btn"
-                    onClick={() => setShowReminder(!showReminder)}
-                >
-                    <span className="emoji">⏰</span>
-                    Remind
-                </button>
+                        <button
+                            type="button"
+                            className="action-btn danger"
+                            onClick={() => onTrash(note.id)}
+                        >
+                            <span className="emoji">🗑️</span>
+                            Trash
+                        </button>
+
+                        <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => setShowLabels(!showLabels)}
+                        >
+                            <span className="emoji">🏷️</span>
+                            Labels
+                        </button>
+
+                        <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => setShowReminder(!showReminder)}
+                        >
+                            <span className="emoji">⏰</span>
+                            Remind
+                        </button>
+                    </>
+                )}
             </div>
         </article>
     );
