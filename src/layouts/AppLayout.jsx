@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
 import SearchBar from "../components/SearchBar";
+import Icon from "../components/ui/Icon";
 import {
     createLabel,
     updateLabel,
@@ -137,7 +138,7 @@ function AppLayout() {
                         aria-label="Open navigation"
                         onClick={() => setSidebarOpen(true)}
                     >
-                        ☰
+                        <Icon name="menu" size={20} />
                     </button>
 
                     <div className="topbar-search">
@@ -148,9 +149,15 @@ function AppLayout() {
                     </div>
 
                     <div className="topbar-right">
-                        <span className="avatar" title="Your account">
+                        <button
+                            type="button"
+                            className="avatar"
+                            title="Your account"
+                            aria-label="Open profile"
+                            onClick={() => navigate("/profile")}
+                        >
                             U
-                        </span>
+                        </button>
                     </div>
                 </header>
 

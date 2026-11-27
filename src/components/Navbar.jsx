@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import Icon from "./ui/Icon";
+
 /*
  * Component Name : Navbar
  * Description    : Provides sidebar navigation and label management.
@@ -9,11 +11,12 @@ import { useNavigate, useLocation } from "react-router-dom";
  */
 
 const NAV_ITEMS = [
-    { path: "/dashboard", label: "Notes", icon: "📝" },
-    { path: "/reminders", label: "Reminders", icon: "⏰" },
-    { path: "/archive", label: "Archive", icon: "📦" },
-    { path: "/trash", label: "Trash", icon: "🗑️" },
-    { path: "/attachments", label: "Attachments", icon: "⇪" }
+    { path: "/dashboard", label: "Notes", icon: "note" },
+    { path: "/reminders", label: "Reminders", icon: "reminder" },
+    { path: "/archive", label: "Archive", icon: "archive" },
+    { path: "/trash", label: "Trash", icon: "trash" },
+    { path: "/attachments", label: "Attachments", icon: "attachment" },
+    { path: "/profile", label: "Profile", icon: "user" }
 ];
 
 function Navbar({
@@ -110,7 +113,9 @@ function Navbar({
     return (
         <aside className={`sidebar ${open ? "open" : ""}`}>
             <div className="brand">
-                <span className="brand-mark">✦</span>
+                <span className="brand-mark">
+                    <Icon name="logo" size={20} />
+                </span>
                 <span>Fundoo Notes</span>
             </div>
 
@@ -127,7 +132,9 @@ function Navbar({
                         }`}
                         onClick={() => handleNavigation(item.path)}
                     >
-                        <span className="nav-icon">{item.icon}</span>
+                        <span className="nav-icon">
+                            <Icon name={item.icon} size={18} />
+                        </span>
                         {item.label}
                     </button>
                 ))}
@@ -144,7 +151,7 @@ function Navbar({
                     aria-label="Create a new label"
                     onClick={openCreateForm}
                 >
-                    {showLabelInput ? "−" : "+"}
+                    <Icon name={showLabelInput ? "minus" : "plus"} size={18} />
                 </button>
             </div>
 
@@ -202,7 +209,9 @@ function Navbar({
                                 }`}
                                 onClick={() => handleLabelSelect(label.id)}
                             >
-                                <span className="nav-icon">🏷️</span>
+                                <span className="nav-icon">
+                                    <Icon name="label" size={18} />
+                                </span>
                                 <span>{label.name}</span>
                             </button>
 
@@ -214,7 +223,7 @@ function Navbar({
                                     aria-label={`Rename ${label.name}`}
                                     onClick={() => openEditForm(label)}
                                 >
-                                    ✎
+                                    <Icon name="edit" size={16} />
                                 </button>
 
                                 <button
@@ -224,7 +233,7 @@ function Navbar({
                                     aria-label={`Delete ${label.name}`}
                                     onClick={() => onDeleteLabel(label.id)}
                                 >
-                                    ×
+                                    <Icon name="close" size={16} />
                                 </button>
                             </div>
                         </div>
@@ -238,7 +247,9 @@ function Navbar({
                     className="nav-item logout-btn"
                     onClick={onLogout}
                 >
-                    <span className="nav-icon">↪</span>
+                    <span className="nav-icon">
+                        <Icon name="logout" size={18} />
+                    </span>
                     Logout
                 </button>
             </div>

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
+import AuthHero from "../components/ui/AuthHero";
 import { requestPasswordReset } from "../services/authService";
 
 function ForgotPasswordPage() {
@@ -33,29 +35,15 @@ function ForgotPasswordPage() {
 
     return (
         <div className="auth-shell">
-            <section className="auth-hero">
-                <div className="auth-logo">
-                    <span className="auth-logo-mark">✦</span>
-                    Fundoo Notes
-                </div>
-
-                <div className="auth-hero-copy">
-                    <h1>Reset your password with ease.</h1>
-                    <p>
-                        We will email you a secure link if an account exists
-                        for the address you enter.
-                    </p>
-                    <div className="auth-hero-tags">
-                        <span>✉️ Secure link</span>
-                        <span>⏱️ Time limited</span>
-                        <span>🔒 Private</span>
-                    </div>
-                </div>
-
-                <div className="auth-hero-footer">
-                    Simple, focused and made for your everyday thoughts.
-                </div>
-            </section>
+            <AuthHero
+                title="Reset your password with ease."
+                description="We will email you a secure link if an account exists for the address you enter."
+                tags={[
+                    { icon: "mail", label: "Secure link" },
+                    { icon: "reminder", label: "Time limited" },
+                    { icon: "lock", label: "Private" }
+                ]}
+            />
 
             <section className="auth-pane">
                 <div className="auth-card">

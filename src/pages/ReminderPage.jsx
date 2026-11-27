@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
+import ActionButton from "../components/ui/ActionButton";
+import EmptyState from "../components/ui/EmptyState";
+import Icon from "../components/ui/Icon";
+import LoadingState from "../components/ui/LoadingState";
+import PageHeader from "../components/ui/PageHeader";
+
 import {
     createReminder,
     deleteReminder,
@@ -186,31 +192,24 @@ function ReminderPage() {
     if (loading) {
         return (
             <main className="page-content">
-                <div className="loading-state">
-                    <div>
-                        <div className="spinner" />
-                        <p>Loading reminders...</p>
-                    </div>
-                </div>
+                <LoadingState label="Loading reminders..." />
             </main>
         );
     }
 
     return (
         <main className="page-content">
-            <div className="page-head">
-                <div>
-                    <h1>Reminders</h1>
-                    <p>Keep track of every reminder you have scheduled.</p>
-                </div>
-                <span className="count-pill">
-                    {reminders.length}{" "}
-                    {reminders.length === 1 ? "reminder" : "reminders"}
-                </span>
-            </div>
+            <PageHeader
+                title="Reminders"
+                description="Keep track of every reminder you have scheduled."
+                count={reminders.length}
+                countLabel={reminders.length === 1 ? "reminder" : "reminders"}
+            />
 
             <div className="info-banner">
-                <span>⏰</span>
+                <span className="info-banner-icon">
+                    <Icon name="reminder" size={18} />
+                </span>
                 Reminders are delivered to your registered email address.
                 All times are shown in IST (Asia/Kolkata). Completed reminders
                 are cleared automatically.
@@ -220,45 +219,39 @@ function ReminderPage() {
                 <h2>Scheduled reminders</h2>
 
                 {reminders.length === 0 ? (
-                    <div className="empty-state">
-                        <div className="empty-icon">⏰</div>
-                        <h3>No reminders scheduled</h3>
-                        <p>Schedule a reminder for a note below.</p>
-                    </div>
+                    <EmptyState
+                        icon="reminder"
+                        title="No reminders scheduled"
+                        description="Schedule a reminder for a note below."
+                    />
                 ) : (
                     <div className="reminder-list">
                         {reminders.map((reminder) => (
                             <article className="reminder-item" key={reminder.id}>
                                 <div className="reminder-item-main">
                                     <h3>{reminder.noteTitle}</h3>
-                                    <p>
-                                        ⏰ {formatReminderTime(
-                                            reminder.reminderTime
-                                        )}
+                                    <p className="reminder-time">
+                                        <Icon name="reminder" size={15} />
+                                        {formatReminderTime(reminder.reminderTime)}
                                     </p>
                                 </div>
 
                                 <div className="reminder-actions">
-                                    <button
-                                        type="button"
-                                        className="icon-button label-edit"
-                                        title="Edit reminder"
-                                        aria-label={`Edit reminder for ${reminder.noteTitle}`}
+                                    <ActionButton
+                                        icon="edit"
+                                        label="Edit"
+                                        ariaLabel={`Edit reminder for ${reminder.noteTitle}`}
                                         onClick={() => openEditForm(reminder)}
-                                    >
-                                        <span aria-hidden="true">✎</span> Edit
-                                    </button>
+                                    />
 
-                                    <button
-                                        type="button"
-                                        className="icon-button label-delete"
-                                        title="Delete reminder"
-                                        aria-label={`Delete reminder for ${reminder.noteTitle}`}
+                                    <ActionButton
+                                        icon="trash"
+                                        label="Delete"
+                                        ariaLabel={`Delete reminder for ${reminder.noteTitle}`}
+                                        className="danger"
                                         disabled={busyId === reminder.id}
                                         onClick={() => handleDeleteReminder(reminder)}
-                                    >
-                                        <span aria-hidden="true">×</span> Delete
-                                    </button>
+                                    />
                                 </div>
 
                                 {editingReminderId === reminder.id && (

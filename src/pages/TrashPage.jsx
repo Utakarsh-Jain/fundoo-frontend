@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import NoteCard from "../components/NoteCard";
+import EmptyState from "../components/ui/EmptyState";
+import LoadingState from "../components/ui/LoadingState";
+import PageHeader from "../components/ui/PageHeader";
 
 import {
     getAllNotes,
@@ -64,35 +67,26 @@ function TrashPage() {
     if (loading) {
         return (
             <main className="page-content">
-                <div className="loading-state">
-                    <div>
-                        <div className="spinner" />
-                        <p>Loading trash...</p>
-                    </div>
-                </div>
+                <LoadingState label="Loading trash..." />
             </main>
         );
     }
 
     return (
         <main className="page-content">
-            <div className="page-head">
-                <div>
-                    <h1>Trash</h1>
-                    <p>Restore anything you deleted by mistake.</p>
-                </div>
-                <span className="count-pill">
-                    {trashedNotes.length}{" "}
-                    {trashedNotes.length === 1 ? "note" : "notes"}
-                </span>
-            </div>
+            <PageHeader
+                title="Trash"
+                description="Restore anything you deleted by mistake."
+                count={trashedNotes.length}
+                countLabel={trashedNotes.length === 1 ? "note" : "notes"}
+            />
 
             {trashedNotes.length === 0 ? (
-                <div className="empty-state">
-                    <div className="empty-icon">🗑️</div>
-                    <h3>Trash is empty</h3>
-                    <p>Deleted notes will appear here until restored.</p>
-                </div>
+                <EmptyState
+                    icon="trash"
+                    title="Trash is empty"
+                    description="Deleted notes will appear here until restored."
+                />
             ) : (
                 <div className="notes-grid">
                     {trashedNotes.map((note) => (

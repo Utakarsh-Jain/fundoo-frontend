@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
+import EmptyState from "../components/ui/EmptyState";
+import Icon from "../components/ui/Icon";
+import LoadingState from "../components/ui/LoadingState";
+import PageHeader from "../components/ui/PageHeader";
+
 import {
     uploadAttachment,
     getAllAttachments,
@@ -192,14 +197,19 @@ function AttachmentPage() {
     const renderAttachment = (attachment) => (
         <li className="attachment-item" key={attachment.id}>
             <div className="attachment-details">
-                <p className="attachment-name">{attachment.originalFileName}</p>
-                <p className="attachment-meta">
-                    {formatFileSize(attachment.fileSize)}
-                    {" · "}
-                    {attachment.contentType}
-                    {" · "}
-                    {new Date(attachment.uploadedAt).toLocaleString()}
-                </p>
+                <span className="attachment-file-icon">
+                    <Icon name="note" size={20} />
+                </span>
+                <div>
+                    <p className="attachment-name">{attachment.originalFileName}</p>
+                    <p className="attachment-meta">
+                        {formatFileSize(attachment.fileSize)}
+                        {" · "}
+                        {attachment.contentType}
+                        {" · "}
+                        {new Date(attachment.uploadedAt).toLocaleString()}
+                    </p>
+                </div>
             </div>
 
             <div className="attachment-actions">
@@ -224,31 +234,25 @@ function AttachmentPage() {
     if (loading) {
         return (
             <main className="page-content">
-                <div className="loading-state">
-                    <div>
-                        <div className="spinner" />
-                        <p>Loading attachments...</p>
-                    </div>
-                </div>
+                <LoadingState label="Loading attachments..." />
             </main>
         );
     }
 
     return (
         <main className="page-content">
-            <div className="page-head">
-                <div>
-                    <h1>Attachments</h1>
-                    <p>Upload files and keep them available across your notes.</p>
-                </div>
-                <span className="count-pill">
-                    {attachments.length}{" "}
-                    {attachments.length === 1 ? "file" : "files"}
-                </span>
-            </div>
+            <PageHeader
+                title="Attachments"
+                description="Upload files and keep them available across your notes."
+                count={attachments.length}
+                countLabel={attachments.length === 1 ? "file" : "files"}
+            />
 
             <section className="attachment-panel">
-                <h2>Upload a file</h2>
+                <h2 className="panel-heading">
+                    <Icon name="attachment" size={18} />
+                    Upload a file
+                </h2>
                 <p className="attachment-hint">
                     PNG, JPEG, GIF, PDF, TXT, DOC, DOCX, XLS and XLSX files up
                     to 10 MB are supported.
@@ -293,10 +297,11 @@ function AttachmentPage() {
                 <h2>Your files</h2>
 
                 {attachments.length === 0 ? (
-                    <div className="attachment-empty">
-                        <h3>No attachments yet</h3>
-                        <p>Uploaded files will appear in this list.</p>
-                    </div>
+                    <EmptyState
+                        icon="attachment"
+                        title="No attachments yet"
+                        description="Uploaded files will appear in this list."
+                    />
                 ) : (
                     <ul className="attachment-list">
                         {attachments.map(renderAttachment)}

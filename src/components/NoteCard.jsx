@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { istNowInputValue } from "../utils/reminderTime";
+import ActionButton from "./ui/ActionButton";
+import Icon from "./ui/Icon";
 
 /*
  * Component Name : NoteCard
@@ -100,7 +102,9 @@ function NoteCard({
             <div className="note-card-top">
                 <h3>{note.title}</h3>
                 {note.pinned && (
-                    <span className="pin-badge" title="Pinned note">📌</span>
+                    <span className="pin-badge" title="Pinned note">
+                        <Icon name="pin" size={14} />
+                    </span>
                 )}
             </div>
 
@@ -144,14 +148,14 @@ function NoteCard({
                     {assignedLabels.map((label) => (
                         <span className="chip" key={label.id}>
                             {label.name}
-                            <button
-                                type="button"
-                                onClick={() => onRemoveLabel(label.id, note.id)}
-                                title="Remove label"
-                                aria-label={`Remove ${label.name}`}
-                            >
-                                ×
-                            </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => onRemoveLabel(label.id, note.id)}
+                                        title="Remove label"
+                                        aria-label={`Remove ${label.name}`}
+                                    >
+                                        <Icon name="close" size={13} />
+                                    </button>
                         </span>
                     ))}
                 </div>
@@ -216,79 +220,57 @@ function NoteCard({
             <div className="note-actions">
                 {note.trashed ? (
                     <>
-                        <button
-                            type="button"
-                            className="action-btn"
+                        <ActionButton
+                            icon="restore"
+                            label="Restore"
                             onClick={() => onRestore(note.id)}
-                        >
-                            <span className="emoji">↩️</span>
-                            Restore
-                        </button>
+                        />
 
-                        <button
-                            type="button"
-                            className="action-btn danger"
+                        <ActionButton
+                            icon="close"
+                            label="Delete forever"
+                            className="danger"
                             onClick={() => onPermanentlyDelete(note.id)}
-                        >
-                            <span className="emoji">✕</span>
-                            Delete forever
-                        </button>
+                        />
                     </>
                 ) : (
                     <>
-                        <button
-                            type="button"
-                            className="action-btn"
+                        <ActionButton
+                            icon="edit"
+                            label="Edit"
                             onClick={openEdit}
-                        >
-                            <span className="emoji">✎</span>
-                            Edit
-                        </button>
+                        />
 
-                        <button
-                            type="button"
-                            className="action-btn"
+                        <ActionButton
+                            icon="pin"
+                            label={note.pinned ? "Unpin" : "Pin"}
                             onClick={() => onPin(note.id)}
-                        >
-                            <span className="emoji">📌</span>
-                            {note.pinned ? "Unpin" : "Pin"}
-                        </button>
+                        />
 
-                        <button
-                            type="button"
-                            className="action-btn"
+                        <ActionButton
+                            icon="archive"
+                            label={note.archived ? "Unarchive" : "Archive"}
                             onClick={() => onArchive(note.id)}
-                        >
-                            <span className="emoji">📦</span>
-                            {note.archived ? "Unarchive" : "Archive"}
-                        </button>
+                        />
 
-                        <button
-                            type="button"
-                            className="action-btn danger"
+                        <ActionButton
+                            icon="trash"
+                            label="Trash"
+                            className="danger"
                             onClick={() => onTrash(note.id)}
-                        >
-                            <span className="emoji">🗑️</span>
-                            Trash
-                        </button>
+                        />
 
-                        <button
-                            type="button"
-                            className="action-btn"
+                        <ActionButton
+                            icon="label"
+                            label="Labels"
                             onClick={() => setShowLabels(!showLabels)}
-                        >
-                            <span className="emoji">🏷️</span>
-                            Labels
-                        </button>
+                        />
 
-                        <button
-                            type="button"
-                            className="action-btn"
+                        <ActionButton
+                            icon="reminder"
+                            label="Remind"
                             onClick={() => setShowReminder(!showReminder)}
-                        >
-                            <span className="emoji">⏰</span>
-                            Remind
-                        </button>
+                        />
                     </>
                 )}
             </div>

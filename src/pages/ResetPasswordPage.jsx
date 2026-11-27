@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
+import AuthHero from "../components/ui/AuthHero";
 import { resetPassword } from "../services/authService";
 
 function ResetPasswordPage() {
@@ -61,29 +63,15 @@ function ResetPasswordPage() {
 
     return (
         <div className="auth-shell">
-            <section className="auth-hero">
-                <div className="auth-logo">
-                    <span className="auth-logo-mark">✦</span>
-                    Fundoo Notes
-                </div>
-
-                <div className="auth-hero-copy">
-                    <h1>Choose a fresh password.</h1>
-                    <p>
-                        Use at least six characters and keep it unique to your
-                        Fundoo account.
-                    </p>
-                    <div className="auth-hero-tags">
-                        <span>🔐 New start</span>
-                        <span>⏱️ Quick step</span>
-                        <span>✦ Back to notes</span>
-                    </div>
-                </div>
-
-                <div className="auth-hero-footer">
-                    Simple, focused and made for your everyday thoughts.
-                </div>
-            </section>
+            <AuthHero
+                title="Choose a fresh password."
+                description="Use at least six characters and keep it unique to your Fundoo account."
+                tags={[
+                    { icon: "lock", label: "New start" },
+                    { icon: "check", label: "Quick step" },
+                    { icon: "note", label: "Back to notes" }
+                ]}
+            />
 
             <section className="auth-pane">
                 <div className="auth-card">
