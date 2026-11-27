@@ -7,6 +7,7 @@ import { createReminder } from "../services/reminderService";
 import {
     getAllNotes,
     createNote,
+    updateNote,
     togglePin,
     toggleArchive,
     toggleTrash
@@ -111,6 +112,12 @@ function DashboardPage() {
         () => toggleTrash(noteId),
         "Note moved to trash.",
         "Failed to move note to trash."
+    );
+
+    const handleUpdate = (noteId, noteData) => runAction(
+        () => updateNote(noteId, noteData),
+        "Note updated successfully!",
+        "Failed to update note."
     );
 
     const handleSetReminder = (noteId, reminderTime) => runAction(
@@ -259,6 +266,7 @@ function DashboardPage() {
                             onPin={handlePin}
                             onArchive={handleArchive}
                             onTrash={handleTrash}
+                            onUpdate={handleUpdate}
                             onSetReminder={handleSetReminder}
                             onAssignLabel={handleAssignLabel}
                             onRemoveLabel={handleRemoveLabel}

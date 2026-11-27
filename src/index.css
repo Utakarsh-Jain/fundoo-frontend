@@ -766,6 +766,37 @@ p {
   flex: 1;
 }
 
+.note-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--surface-soft);
+}
+
+.note-edit-form .input {
+  padding: 9px 10px;
+  font-size: 13px;
+}
+
+.note-edit-form textarea.input {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.note-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.note-edit-actions .btn {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
 .pin-badge {
   flex: 0 0 auto;
   width: 28px;
