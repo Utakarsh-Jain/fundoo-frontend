@@ -137,9 +137,11 @@ describe("reminder management flow", () => {
         renderPage();
 
         await screen.findByRole("heading", { name: "Project" });
-        await user.click(
-            screen.getByRole("button", { name: "Edit reminder for Project" })
-        );
+        const editButton = screen.getByRole("button", {
+            name: "Edit reminder for Project"
+        });
+        expect(editButton).toHaveTextContent("Edit");
+        await user.click(editButton);
 
         const input = screen.getByLabelText(
             "New reminder time for Project"
@@ -162,11 +164,14 @@ describe("reminder management flow", () => {
         renderPage();
 
         await screen.findByRole("heading", { name: "Project" });
-        await user.click(
-            screen.getByRole("button", { name: "Delete reminder for Project" })
-        );
+        const deleteButton = screen.getByRole("button", {
+            name: "Delete reminder for Project"
+        });
+        expect(deleteButton).toHaveTextContent("Delete");
+        await user.click(deleteButton);
 
         await waitFor(() => {
+
             expect(mocks.deleteReminder).toHaveBeenCalledWith(1);
         });
         await waitFor(() => {

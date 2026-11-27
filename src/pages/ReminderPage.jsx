@@ -246,7 +246,7 @@ function ReminderPage() {
                                         aria-label={`Edit reminder for ${reminder.noteTitle}`}
                                         onClick={() => openEditForm(reminder)}
                                     >
-                                        ✎
+                                        <span aria-hidden="true">✎</span> Edit
                                     </button>
 
                                     <button
@@ -257,7 +257,7 @@ function ReminderPage() {
                                         disabled={busyId === reminder.id}
                                         onClick={() => handleDeleteReminder(reminder)}
                                     >
-                                        ×
+                                        <span aria-hidden="true">×</span> Delete
                                     </button>
                                 </div>
 
