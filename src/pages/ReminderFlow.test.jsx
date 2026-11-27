@@ -31,10 +31,21 @@ let notes = [];
 
 function toInputValue(value) {
     const date = new Date(value);
-    const local = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
+    const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+    }).formatToParts(date);
+
+    const values = Object.fromEntries(
+        parts.map((part) => [part.type, part.value])
     );
-    return local.toISOString().slice(0, 16);
+
+    return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}`;
 }
 
 function futureInput(days) {
@@ -117,6 +128,8 @@ describe("reminder management flow", () => {
             .toBeInTheDocument();
         expect(screen.queryByLabelText("Reminder time for Project"))
             .not.toBeInTheDocument();
+        expect(screen.getByText(/All times are shown in IST/))
+            .toBeInTheDocument();
     });
 
     it("updates a reminder and refreshes the list", async () => {
